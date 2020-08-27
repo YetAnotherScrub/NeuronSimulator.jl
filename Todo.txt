@@ -1,0 +1,3 @@
+6: Improve thesis - diagram, code snippets
+
+Sanity check function for validating models?
