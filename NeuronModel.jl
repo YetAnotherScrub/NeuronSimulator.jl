@@ -1,8 +1,3 @@
-using DifferentialEquations
-using Plots
-using Unitful
-using UnitfulRecipes
-
 # Bring some units into a convenient namespace.
 V = typeof(1.0u"V")
 mV = typeof(1.0u"mV")

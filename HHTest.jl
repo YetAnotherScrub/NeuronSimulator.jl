@@ -1,6 +1,18 @@
-include("HH.jl")
-using BenchmarkTools
 # An example to test the Hodgkin-Huxley model implementation.
+using NeuronSimulator
+using BenchmarkTools
+# Need to explicitly include these
+using Unitful
+using UnitfulRecipes
+
+# Bring some units into a convenient namespace.
+V = typeof(1.0u"V")
+mV = typeof(1.0u"mV")
+A = typeof(1.0u"A")
+S = typeof(1.0u"S")
+F = typeof(1.0u"F")
+s = typeof(1.0u"s")
+per_s = typeof(1.0u"1/s")
 
 function hh_channels() :: Array{Chan, 1}
     # Original formulation from Wikipedia

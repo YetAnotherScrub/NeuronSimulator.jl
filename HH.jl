@@ -1,5 +1,3 @@
-include("NeuronModel.jl")
-
 """
     GatingVariable(n0, α, β)
 
@@ -71,7 +69,7 @@ mutable struct Chan
     gating_vars :: Array{GatingVariable, 1}
     gv_mult :: Function
     Chan(vi, g, gvs, mult) = new(vi, g, gvs, mult)
-    Chan() = Chan(0.0, 0.0, [], gvs -> 1)
+    Chan() = Chan(0.0u"V", 0.0u"S", [], gvs -> 1)
 end
 
 """
@@ -91,7 +89,7 @@ mutable struct InitValues
     C :: F # Capacitance
     I :: Function # Input current, now a function of time
     InitValues(v, c, i) = new(v, c, i)
-    InitValues() = InitValues(0.0, 0.0, 0.0)
+    InitValues() = InitValues(0.0u"V", 0.0u"F", t -> 0.0u"A")
 end
 
 """
@@ -133,9 +131,6 @@ function get_gvs(model :: HHNeuronModel) :: Tuple{Array{GatingVariable, 1}, Dict
     return (gvs, indices)
 end
 
-Float64
-
-# Given a channel, the gvs, the model and the values of the variables, return the current through that channel.
 """
     channel_current(chan :: Chan, u :: Array, indices :: Dict{Chan, Int}) :: typeof(1.0u"A")
 
@@ -163,7 +158,6 @@ function channel_current(chan :: Chan, u :: Array, indices :: Dict{Chan, Int}) :
     return uconvert(u"A", chan.g * mult * (chan.Vi - u[1]))
 end
 
-# Given a gv and the voltage, acts as the in-place DE for the gv.
 """
     gv_function(gv :: GatingVariable, v :: typeof(1.0u"V"), n) :: typeof(1.0u"1/s")
 
