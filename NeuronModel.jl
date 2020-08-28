@@ -106,5 +106,5 @@ end
 import Base.zero
 # Hack to make DifferentialEquations work with an array with some Unitful and some raw values.
 function zero(arr ::Array{Quantity{Float64,D,U} where U where D}) :: Array{Quantity{Float64,D,U} where U where D}
-    return map(x -> x * 0, arr)
+    return map(x -> x * 0.0, arr)
 end
