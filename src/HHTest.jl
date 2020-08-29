@@ -45,23 +45,22 @@ function vary_input_current(t :: s)
 end
 
 function test_constant()
-    model = HHNeuronModel(hh_channels(), InitValues(-0.06u"V", 1.0e-6u"F", input_current)) # Input current now a function of time.
-    param = Params((0.0u"s", 0.02u"s"))#, 1e-3, 1e-5, 1e6
+    model = HHNeuronModel(hh_channels(), InitValues(-0.06u"V", 1.0e-6u"F"))
+    param = Params((0.0u"s", 0.02u"s"), input_current)
     sol = simulate(model, param)
     plot_voltage(sol)
-    # plot(sol, labels=["V" "m" "h" "n"], xaxis="Time")
 end
 
 function test_vary()
-    model = HHNeuronModel(hh_channels(), InitValues(-0.06u"V", 1.0e-6u"F", vary_input_current)) # Input current now a function of time.
-    param = Params((0.0u"s", 0.2u"s"))#, 1e-3, 1e-5, 1e6
+    model = HHNeuronModel(hh_channels(), InitValues(-0.06u"V", 1.0e-6u"F"))
+    param = Params((0.0u"s", 0.2u"s"), vary_input_current)
     sol = simulate(model, param)
     plot_voltage(sol)
-    # plot(sol, labels=["V" "m" "h" "n"], xaxis="Time")
 end
+
 # For timing with the @benchmark macro
 function time(maxtime)
-    model = HHNeuronModel(hh_channels(), InitValues(-0.06u"V", 1.0e-6u"F", vary_input_current)) # Input current now a function of time.
-    param = Params((0.0u"s", maxtime * 1u"s"))#, 1e-3, 1e-5, 1e6
+    model = HHNeuronModel(hh_channels(), InitValues(-0.06u"V", 1.0e-6u"F"))
+    param = Params((0.0u"s", maxtime * 1u"s"), vary_input_current)
     sol = simulate(model, param)
 end

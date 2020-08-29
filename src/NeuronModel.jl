@@ -51,19 +51,25 @@ function get_variables(model :: t where t <: NeuronModel) :: Array
 end
 
 """
-The input parameters for the simulation.
-Currently just contains the timespan, a tuple in Unitful seconds, but other arguments for the solver may be added in the future.
+The input parameters for the simulation. Contains the timespan, a tuple in Unitful seconds,
+and the input current, which is a function of time, of the form
+
+    function input_current(t :: typeof(1.0u"s")) :: typeof(1.0u"A")
+
+and must be written with awareness of the Unitful units.
+Other arguments for the solver may be added in the future.
 
 # Examples
 ```julia-repl
-julia> Params((0.0u"s", 1.0u"s"))
-Params((0.0 s, 1.0 s))
+julia> Params((0.0u"s", 1.0u"s"), t -> 2.7e-5u"A")
+Params((0.0 s, 1.0 s), var"#26#27"())
 ```
 
 See also: [`simulate`](@ref)
 """
 mutable struct Params
     tspan :: Tuple{s, s}
+    input_current :: Function
     # Other arguments could be added here?
 end
 
@@ -93,7 +99,7 @@ function simulate(model, param :: Params) :: ODESolution{}
     if !(model isa NeuronModel) throw(ArgumentError("The model must be a child of the abstract NeuronModel type.")) end
     f = voltage_function(model)
     u0 = get_variables(model)
-    prob = ODEProblem(f, u0, param.tspan)
+    prob = ODEProblem(f, u0, param.tspan, param.input_current)
     sol = solve(prob, Tsit5())
     return sol
 end

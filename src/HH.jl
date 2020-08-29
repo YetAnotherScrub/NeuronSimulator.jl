@@ -78,18 +78,12 @@ end
 A structure of values for intialising a [`HHNeuronModel`](@ref).
 `V0` is the starting voltage, given in Unitful volts.
 `C` is the membrane capacitance, given in Unitful Farads.
-`I` is the input current, which should be a function of time, of the form
-
-    function input_current(t :: typeof(1.0u"s")) :: typeof(1.0u"A")
-
-and must be written with awareness of the Unitful units.
 """
 mutable struct InitValues
     V0 :: V # Starting voltage
     C :: F # Capacitance
-    I :: Function # Input current, now a function of time
-    InitValues(v, c, i) = new(v, c, i)
-    InitValues() = InitValues(0.0u"V", 0.0u"F", t -> 0.0u"A")
+    InitValues(v, c) = new(v, c)
+    InitValues() = InitValues(0.0u"V", 0.0u"F")
 end
 
 """
@@ -195,9 +189,8 @@ See also: [`HHNeuronModel`](@ref), [`simulate`](@ref)
 function voltage_function(model :: HHNeuronModel) # Type is f for f(V, p, t) = ...
     (gvs, indices) = get_gvs(model)
     function f!(du :: Array{}, u, p, t) :: Array{} # du is array of diff eqs. u is array of vars: V and gvs.
-        # 1u"1/s" * ustript(u"V/s", # Forcefully remove the volts
         du[1] :: typeof(1.0u"V/s") = uconvert(u"V/s",
-            (model.init_values.I(t) :: A
+            (p(t) :: A # p is the input_current function.
             + sum(map(chan -> channel_current(chan, u, indices), model.chans))) / model.init_values.C)
         for i = 2:length(du)
             du[i] :: per_s = gv_function(gvs[i-1], uconvert(u"V", u[1]), u[i])
